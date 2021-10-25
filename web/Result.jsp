@@ -6,6 +6,8 @@
 </head>
 <body>
 <%
+    String pageId = (String) session.getAttribute("pageId");
+
     DecimalFormat df = new DecimalFormat("0.00");
     double curBla = (double) session.getAttribute("userBla");
 %>
@@ -15,7 +17,11 @@
 </body>
 <script>
     function returnPage(){
-        window.location.href = "/Guest.jsp";
+        if(<%= pageId.equals("admin")%>){
+            window.location.href = "/Admin.jsp";
+        }else {
+            window.location.href = "/Guest.jsp";
+        }
     }
 </script>
 </html>

@@ -44,6 +44,7 @@ public class BusinessServlet extends HttpServlet{
                     while(resultSet.next()){
                         int accountType = resultSet.getInt("ATYPE");
                         if(accountType != 1){
+                            session.setAttribute("pageId", "guest");
                             session.setAttribute("message", "账户类型不支持此业务！");
                             response.sendRedirect("/Failed.jsp");
                             return;
@@ -81,6 +82,7 @@ public class BusinessServlet extends HttpServlet{
                 }
 
                 //重定向至成功页面
+                session.setAttribute("pageId", "guest");
                 response.sendRedirect("/Success.jsp");
                 return;
 
@@ -102,6 +104,7 @@ public class BusinessServlet extends HttpServlet{
                     while(resultSet.next()){
                         int accountType = resultSet.getInt("ATYPE");
                         if(accountType != 1){
+                            session.setAttribute("pageId", "guest");
                             session.setAttribute("message", "账户类型不支持此业务！");
                             response.sendRedirect("/Failed.jsp");
                             return;
@@ -122,10 +125,12 @@ public class BusinessServlet extends HttpServlet{
                         double curBLA = resultSet.getDouble("BLA");
                         System.out.println(curBLA);
                         if(withdrawBLA > curBLA){
+                            session.setAttribute("pageId", "guest");
                             session.setAttribute("message", "取款金额大于账户余额！");
                             response.sendRedirect("/Failed.jsp");
                             return;
                         }else if(curBLA == 0){
+                            session.setAttribute("pageId", "guest");
                             session.setAttribute("message", "账户中余额为0！");
                             response.sendRedirect("/Failed.jsp");
                             return;
@@ -163,6 +168,7 @@ public class BusinessServlet extends HttpServlet{
                 }
 
                 //重定向至成功页面
+                session.setAttribute("pageId", "guest");
                 response.sendRedirect("/Success.jsp");
                 return;
 
@@ -177,6 +183,7 @@ public class BusinessServlet extends HttpServlet{
                     while (resultSet.next()){
                         balance = resultSet.getDouble("BLA");
                     }
+                    session.setAttribute("pageId", "guest");
                     session.setAttribute("userBla", balance);
                     response.sendRedirect("/Result.jsp");
                     return;
@@ -291,6 +298,7 @@ public class BusinessServlet extends HttpServlet{
                 }
 
                 //重定向至结果页面
+                session.setAttribute("pageId", "guest");
                 response.sendRedirect("/TradeResult.jsp");
                 return ;
             }

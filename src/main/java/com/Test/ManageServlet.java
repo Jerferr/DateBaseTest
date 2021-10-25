@@ -1,11 +1,9 @@
 package com.Test;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.sql.*;
 
 public class ManageServlet extends HttpServlet {
@@ -16,8 +14,7 @@ public class ManageServlet extends HttpServlet {
     static final String ConnContent = "jdbc:sqlserver://182.92.211.169:1433;databaseName=BankDB;user=U1;password=0";
     static final String DB_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException{
+    protected void doPost(HttpServletRequest request, HttpServletResponse response){
         Connection connection;
         ResultSet resultSet;
         String tradeType = request.getParameter("tradeType");
@@ -45,6 +42,7 @@ public class ManageServlet extends HttpServlet {
 
                     if(!resultSet.next()){
                         session.setAttribute("message", "账户不存在！");
+                        session.setAttribute("pageId", "admin");
                         response.sendRedirect("/Failed.jsp");
                         return;
                     }
@@ -63,6 +61,7 @@ public class ManageServlet extends HttpServlet {
                         int accountType = resultSet.getInt("ATYPE");
                         if(accountType != 1){
                             session.setAttribute("message", "账户类型不支持此业务！");
+                            session.setAttribute("pageId", "admin");
                             response.sendRedirect("/Failed.jsp");
                             return;
                         }
@@ -119,6 +118,7 @@ public class ManageServlet extends HttpServlet {
 
                     if(!resultSet.next()){
                         session.setAttribute("message", "账户不存在！");
+                        session.setAttribute("pageId", "admin");
                         response.sendRedirect("/Failed.jsp");
                         return;
                     }
@@ -137,6 +137,7 @@ public class ManageServlet extends HttpServlet {
                         int accountType = resultSet.getInt("ATYPE");
                         if(accountType != 1){
                             session.setAttribute("message", "账户类型不支持此业务！");
+                            session.setAttribute("pageId", "admin");
                             response.sendRedirect("/Failed.jsp");
                             return;
                         }
@@ -157,10 +158,12 @@ public class ManageServlet extends HttpServlet {
                         System.out.println(curBLA);
                         if(withdrawBLA > curBLA){
                             session.setAttribute("message", "取款金额大于账户余额！");
+                            session.setAttribute("pageId", "admin");
                             response.sendRedirect("/Failed.jsp");
                             return;
                         }else if(curBLA == 0){
                             session.setAttribute("message", "账户中余额为0！");
+                            session.setAttribute("pageId", "admin");
                             response.sendRedirect("/Failed.jsp");
                             return;
                         }
@@ -212,6 +215,7 @@ public class ManageServlet extends HttpServlet {
 
                     if(!resultSet.next()){
                         session.setAttribute("message", "账户不存在！");
+                        session.setAttribute("pageId", "admin");
                         response.sendRedirect("/Failed.jsp");
                         return;
                     }
@@ -230,6 +234,7 @@ public class ManageServlet extends HttpServlet {
                         balance = resultSet.getDouble("BLA");
                     }
                     session.setAttribute("userBla", balance);
+                    session.setAttribute("pageId", "admin");
                     response.sendRedirect("/Result.jsp");
                     return;
                 }catch (SQLException sqle){
@@ -249,6 +254,7 @@ public class ManageServlet extends HttpServlet {
 
                     if(!resultSet.next()){
                         session.setAttribute("message", "账户不存在！");
+                        session.setAttribute("pageId", "admin");
                         response.sendRedirect("/Failed.jsp");
                         return;
                     }
@@ -359,10 +365,52 @@ public class ManageServlet extends HttpServlet {
                 }
 
                 //重定向至结果页面
+                session.setAttribute("pageId", "admin");
                 response.sendRedirect("/TradeResult.jsp");
                 return ;
             }else if(tradeType.equals("createuser")){
-               // String userName = request.getParameter("")
+                String userName = request.getParameter("userName");
+                String userPWD = request.getParameter("userPWD");
+                String userType = request.getParameter("userType");
+                String accountName = request.getParameter("name");
+                String withdrawMoney = request.getParameter("withdrawMoney");
+
+                //查询账户是否存在，若已存在重定向至错误页
+                try{
+                    String SQL = "select ID from BankDB.dbo.Accounts where ID = ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                    preparedStatement.setInt(1, Integer.parseInt(userName));
+                    resultSet = preparedStatement.executeQuery();
+
+                    if(resultSet.next()){
+                        session.setAttribute("pageId", "admin");
+                        session.setAttribute("message", "账户已存在，请勿重复创建！");
+                        response.sendRedirect("/Failed.jsp");
+                        return;
+                    }
+                }catch (SQLException sqle){
+                    sqle.printStackTrace();
+                }
+
+                //创建用户
+                try{
+                    String SQL = "insert into BankDB.dbo.Accounts (ID, NAME, PWD, ATYPE, BLA) values (?, ?, ?, ?, ?);";
+                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                    preparedStatement.setInt(1, Integer.parseInt(userName));
+                    preparedStatement.setString(2, accountName);
+                    preparedStatement.setInt(3, Integer.parseInt(userPWD));
+                    preparedStatement.setInt(4, Integer.parseInt(userType));
+                    preparedStatement.setDouble(5, Double.parseDouble(withdrawMoney));
+                    preparedStatement.executeUpdate();
+
+                    session.setAttribute("pageId", "admin");
+                    session.setAttribute("message", "用户创建成功！");
+                    response.sendRedirect("/Success.jsp");
+                    return;
+                }catch (SQLException sqle){
+                    sqle.printStackTrace();
+                }
+
             }
 
         }catch (Exception e){

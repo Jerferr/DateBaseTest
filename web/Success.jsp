@@ -2,6 +2,9 @@
 <html>
 <head>
     <title>Success Page</title>
+    <%
+        String pageId = (String) session.getAttribute("pageId");
+    %>
 </head>
 <body>
 <h1 style="margin-left: auto">成功！</h1>
@@ -9,7 +12,11 @@
 </body>
 <script>
     function returnPage(){
-        window.location.href = "/Guest.jsp";
+        if(<%= pageId.equals("admin")%>){
+            window.location.href = "/Admin.jsp";
+        }else {
+            window.location.href = "/Guest.jsp";
+        }
     }
 </script>
 </html>

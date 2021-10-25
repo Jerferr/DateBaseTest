@@ -6,6 +6,8 @@
     <title>Result Page</title>
 </head>
 <%
+    String pageId = (String) session.getAttribute("pageId");
+
     TradeResult[] saveResult = new TradeResult[200];
     TradeResult[] withdrawResult = new TradeResult[200];
     for(int i = 0; i < 200; i++){
@@ -91,7 +93,11 @@
 </body>
 <script>
     function returnPage(){
-        window.location.href = "/Guest.jsp";
+        if(<%= pageId.equals("admin")%>){
+            window.location.href = "/Admin.jsp";
+        }else {
+            window.location.href = "/Guest.jsp";
+        }
     }
 </script>
 </html>
