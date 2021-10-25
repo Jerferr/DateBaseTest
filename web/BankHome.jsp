@@ -1,16 +1,24 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
     <title>Hello</title>
 </head>
 <body>
     选择登录身份
-    <form name="form" method="post" action="/Client" onsubmit="return checkEmpty(this);">
-        <input type="radio" name="usertype" value="admin">柜员<br>
-        <input type="radio" name="usertype" value="guest">客户<br>
+    <form name="form" method="post" action="${pageContext.request.contextPath}/Client" onsubmit="return checkEmpty(this);">
+        <label>
+            <input type="radio" name="usertype" value="admin">
+        </label>柜员<br>
+        <label>
+            <input type="radio" name="usertype" value="guest">
+        </label>客户<br>
         请输入账号及密码：<br>
-        账号：<input type="text" name="username"><br>
-        密码：<input type="password" name="pwd"><br>
+        账号：<label>
+        <input type="text" name="username">
+    </label><br>
+        密码：<label>
+        <input type="password" name="pwd">
+    </label><br>
         <input type="submit" value="确定">
     </form>
 </body>
