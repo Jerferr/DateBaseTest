@@ -24,393 +24,401 @@ public class ManageServlet extends HttpServlet {
             Class.forName(DB_DRIVER);
             connection = DriverManager.getConnection(ConnContent);
 
-            if(tradeType.equals("save")){
-                double saveBLA;
-                String tradeDate;
-                long serialNum = System.currentTimeMillis();
-                String userName = request.getParameter("userName");
+            switch (tradeType) {
+                case "save": {
+                    double saveBLA;
+                    String tradeDate;
+                    long serialNum = System.currentTimeMillis();
+                    String userName = request.getParameter("userName");
 
-                saveBLA = Double.parseDouble(request.getParameter("saveBla"));
-                tradeDate = request.getParameter("tradeDate");
+                    saveBLA = Double.parseDouble(request.getParameter("saveBla"));
+                    tradeDate = request.getParameter("tradeDate");
 
-                //查询账户是否存在，不存在重定向至错误页
-                try{
-                    String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
+                    //查询账户是否存在，不存在重定向至错误页
+                    try {
+                        String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
 
-                    if(!resultSet.next()){
-                        session.setAttribute("message", "账户不存在！");
-                        session.setAttribute("pageId", "admin");
-                        response.sendRedirect("/Failed.jsp");
-                        return;
-                    }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //查询账户类型，定期存款不能存取
-                try{
-                    String SQL0 = "select ATYPE from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL0);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    while(resultSet.next()){
-                        int accountType = resultSet.getInt("ATYPE");
-                        if(accountType != 1){
-                            session.setAttribute("message", "账户类型不支持此业务！");
+                        if (!resultSet.next()) {
+                            session.setAttribute("message", "账户不存在！");
                             session.setAttribute("pageId", "admin");
                             response.sendRedirect("/Failed.jsp");
                             return;
                         }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
                     }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
 
-                //更新账户，添加存款数目
-                try{
-                    String SQL1 = "update BankDB.dbo.Accounts set BLA = BLA + ? where ID = ?;";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
-                    preparedStatement.setDouble(1, saveBLA);
-                    preparedStatement.setInt(2, Integer.parseInt(userName));
-                    preparedStatement.executeUpdate();
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
+                    //查询账户类型，定期存款不能存取
+                    try {
+                        String SQL0 = "select ATYPE from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL0);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
 
-                //添加交易记录
-                try{
-                    String SQL2 = "insert into BankDB.dbo.Trades (SNUM, ID, TIME, TTYPE, SUM, SOUR)" +
-                            "values(?,?,?,?,?,?);";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL2);
-                    preparedStatement.setLong(1, serialNum);
-                    preparedStatement.setInt(2, Integer.parseInt(userName));
-                    preparedStatement.setString(3, tradeDate);
-                    preparedStatement.setInt(4, 1);
-                    preparedStatement.setDouble(5, saveBLA);
-                    preparedStatement.setInt(6, 1);
-                    preparedStatement.executeUpdate();
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //重定向至成功页面
-                response.sendRedirect("/Success.jsp");
-                return;
-            }else if(tradeType.equals("withdraw")){
-                double withdrawBLA;
-                String tradeDate;
-                String userName = request.getParameter("userName");
-                long serialNum = System.currentTimeMillis();
-
-                withdrawBLA = Double.parseDouble(request.getParameter("withdrawBla"));
-                tradeDate = request.getParameter("tradeDate");
-
-                //查询账户是否存在，不存在重定向至错误页
-                try{
-                    String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    if(!resultSet.next()){
-                        session.setAttribute("message", "账户不存在！");
-                        session.setAttribute("pageId", "admin");
-                        response.sendRedirect("/Failed.jsp");
-                        return;
-                    }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //查询账户类型，定期存款不能存取
-                try{
-                    String SQL0 = "select ATYPE from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL0);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    while(resultSet.next()){
-                        int accountType = resultSet.getInt("ATYPE");
-                        if(accountType != 1){
-                            session.setAttribute("message", "账户类型不支持此业务！");
-                            session.setAttribute("pageId", "admin");
-                            response.sendRedirect("/Failed.jsp");
-                            return;
+                        while (resultSet.next()) {
+                            int accountType = resultSet.getInt("ATYPE");
+                            if (accountType != 1) {
+                                session.setAttribute("message", "账户类型不支持此业务！");
+                                session.setAttribute("pageId", "admin");
+                                response.sendRedirect("/Failed.jsp");
+                                return;
+                            }
                         }
-                    }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //查询余额，保证存款可以顺利进行
-                try{
-                    String SQL1 = "select BLA from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    while (resultSet.next()){
-                        double curBLA = resultSet.getDouble("BLA");
-                        System.out.println(curBLA);
-                        if(withdrawBLA > curBLA){
-                            session.setAttribute("message", "取款金额大于账户余额！");
-                            session.setAttribute("pageId", "admin");
-                            response.sendRedirect("/Failed.jsp");
-                            return;
-                        }else if(curBLA == 0){
-                            session.setAttribute("message", "账户中余额为0！");
-                            session.setAttribute("pageId", "admin");
-                            response.sendRedirect("/Failed.jsp");
-                            return;
-                        }
-                    }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //更新账户，扣除取款数目
-                try{
-                    String SQL2 = "update BankDB.dbo.Accounts set BLA = BLA - ? where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL2);
-                    preparedStatement.setDouble(1, withdrawBLA);
-                    preparedStatement.setInt(2, Integer.parseInt(userName));
-                    preparedStatement.executeUpdate();
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //添加交易记录
-                try {
-                    String SQL3= "insert into BankDB.dbo.Trades (snum, id, time, ttype, sum, sour)" +
-                            "values (?,?,?,?,?,?)";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL3);
-                    preparedStatement.setLong(1, serialNum);
-                    preparedStatement.setInt(2, Integer.parseInt(userName));
-                    preparedStatement.setString(3, tradeDate);
-                    preparedStatement.setInt(4, 2);
-                    preparedStatement.setDouble(5, withdrawBLA);
-                    preparedStatement.setInt(6, 1);
-                    preparedStatement.executeUpdate();
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //重定向至成功页面
-                response.sendRedirect("/Success.jsp");
-                return;
-            }else if(tradeType.equals("querybalance")){
-                double balance = -1;
-                String userName = request.getParameter("userName");
-
-                //查询账户是否存在，不存在重定向至错误页
-                try{
-                    String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    if(!resultSet.next()){
-                        session.setAttribute("message", "账户不存在！");
-                        session.setAttribute("pageId", "admin");
-                        response.sendRedirect("/Failed.jsp");
-                        return;
-                    }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //查询余额
-                try{
-                    String SQL1 = "select BLA from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    while (resultSet.next()){
-                        balance = resultSet.getDouble("BLA");
-                    }
-                    session.setAttribute("userBla", balance);
-                    session.setAttribute("pageId", "admin");
-                    response.sendRedirect("/Result.jsp");
-                    return;
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-            }else if(tradeType.equals("querytrade")){
-                String startDate = request.getParameter("startDate");
-                String endDate = request.getParameter("endDate");
-                String userName = request.getParameter("userName");
-
-                //查询账户是否存在，不存在重定向至错误页
-                try{
-                    String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    if(!resultSet.next()){
-                        session.setAttribute("message", "账户不存在！");
-                        session.setAttribute("pageId", "admin");
-                        response.sendRedirect("/Failed.jsp");
-                        return;
-                    }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //查询存入交易
-                try{
-                    String SQL1 = "select SNUM, ID, TIME, TTYPE, SOUR, SUM from BankDB.dbo.Trades where ID = ? and TIME >= ? and TIME <= ? and TTYPE = 1 order by TIME;";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    preparedStatement.setString(2, startDate);
-                    preparedStatement.setString(3, endDate);
-                    resultSet = preparedStatement.executeQuery();
-
-                    //resultSet.last();
-                    int cnt ;//= resultSet.getRow();
-                    TradeResult[] saveResult = new TradeResult[200];
-                    for(int i = 0; i < 200; i ++){
-                        saveResult[i] = new TradeResult();
-                        saveResult[i].sum = 0;
-                        saveResult[i].tradeSource = 0;
-                        saveResult[i].tradeDate = " ";
-                        saveResult[i].tradeType = 0;
-                        saveResult[i].serialNum = 0;
-                        saveResult[i].userID = 0;
-                    }
-                    //resultSet.first();
-                    cnt = 0;
-                    double totalIncome = 0;
-
-                    long snum;
-                    double s;
-                    int id;
-                    int tt;
-                    String t;
-                    int sour;
-
-                    while (resultSet.next()){
-                        snum = resultSet.getLong("SNUM");
-                        s = resultSet.getDouble("SUM");
-                        id = resultSet.getInt("ID");
-                        tt = resultSet.getInt("TTYPE");
-                        t = resultSet.getString("TIME");
-                        sour = resultSet.getInt("SOUR");
-                        System.out.println(snum + " " + s + " " + id + " " + tt + " " + t + " " + sour);
-
-                        saveResult[cnt].serialNum = snum;
-                        saveResult[cnt].sum = s;
-                        saveResult[cnt].userID = id;
-                        saveResult[cnt].tradeType = tt;
-                        saveResult[cnt].tradeDate = t;
-                        saveResult[cnt].tradeSource = sour;
-                        totalIncome += s;
-                        cnt++;
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
                     }
 
-                    session.setAttribute("saveResult" ,saveResult);
-                    session.setAttribute("totalIncome", totalIncome);
-                    session.setAttribute("saveItemNum", cnt);
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //查询取款
-                try{
-                    String SQL2 = "select * from BankDB.dbo.Trades where ID = ? and TIME >= ? and TIME <= ? and TTYPE = 2 order by TIME;";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL2);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    preparedStatement.setString(2, startDate);
-                    preparedStatement.setString(3, endDate);
-                    resultSet = preparedStatement.executeQuery();
-
-                    //resultSet.last();
-                    int cnt ;//= resultSet.getRow();
-                    TradeResult[] withdrawResult = new TradeResult[200];
-                    //resultSet.first();
-                    cnt = 0;
-                    double totalExpenditure = 0;
-                    for(int i = 0; i < 200; i ++) {
-                        withdrawResult[i] = new TradeResult();
-                        withdrawResult[i].sum = 0;
-                        withdrawResult[i].tradeSource = 0;
-                        withdrawResult[i].tradeDate = " ";
-                        withdrawResult[i].tradeType = 0;
-                        withdrawResult[i].serialNum = 0;
-                        withdrawResult[i].userID = 0;
+                    //更新账户，添加存款数目
+                    try {
+                        String SQL1 = "update BankDB.dbo.Accounts set BLA = BLA + ? where ID = ?;";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
+                        preparedStatement.setDouble(1, saveBLA);
+                        preparedStatement.setInt(2, Integer.parseInt(userName));
+                        preparedStatement.executeUpdate();
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
                     }
 
-                    while (resultSet.next()){
-                        withdrawResult[cnt].setSerialNum(resultSet.getLong("SNUM"));
-                        withdrawResult[cnt].setSum(resultSet.getDouble("SUM"));
-                        withdrawResult[cnt].setUserID(resultSet.getInt("ID"));
-                        withdrawResult[cnt].setTradeType(resultSet.getInt("TTYPE"));
-                        withdrawResult[cnt].setTradeDate(resultSet.getString("TIME"));
-                        withdrawResult[cnt].setTradeSource(resultSet.getInt("SOUR"));
-                        totalExpenditure += withdrawResult[cnt].getSum();
-                        cnt++;
+                    //添加交易记录
+                    try {
+                        String SQL2 = "insert into BankDB.dbo.Trades (SNUM, ID, TIME, TTYPE, SUM, SOUR)" +
+                                "values(?,?,?,?,?,?);";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL2);
+                        preparedStatement.setLong(1, serialNum);
+                        preparedStatement.setInt(2, Integer.parseInt(userName));
+                        preparedStatement.setString(3, tradeDate);
+                        preparedStatement.setInt(4, 1);
+                        preparedStatement.setDouble(5, saveBLA);
+                        preparedStatement.setInt(6, 1);
+                        preparedStatement.executeUpdate();
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
                     }
 
-                    session.setAttribute("withdrawResult", withdrawResult);
-                    session.setAttribute("totalExpenditure", totalExpenditure);
-                    session.setAttribute("withdrawItemNum", cnt);
-
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //重定向至结果页面
-                session.setAttribute("pageId", "admin");
-                response.sendRedirect("/TradeResult.jsp");
-                return ;
-            }else if(tradeType.equals("createuser")){
-                String userName = request.getParameter("userName");
-                String userPWD = request.getParameter("userPWD");
-                String userType = request.getParameter("userType");
-                String accountName = request.getParameter("name");
-                String withdrawMoney = request.getParameter("withdrawMoney");
-
-                //查询账户是否存在，若已存在重定向至错误页
-                try{
-                    String SQL = "select ID from BankDB.dbo.Accounts where ID = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    resultSet = preparedStatement.executeQuery();
-
-                    if(resultSet.next()){
-                        session.setAttribute("pageId", "admin");
-                        session.setAttribute("message", "账户已存在，请勿重复创建！");
-                        response.sendRedirect("/Failed.jsp");
-                        return;
-                    }
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
-                }
-
-                //创建用户
-                try{
-                    String SQL = "insert into BankDB.dbo.Accounts (ID, NAME, PWD, ATYPE, BLA) values (?, ?, ?, ?, ?);";
-                    PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-                    preparedStatement.setInt(1, Integer.parseInt(userName));
-                    preparedStatement.setString(2, accountName);
-                    preparedStatement.setInt(3, Integer.parseInt(userPWD));
-                    preparedStatement.setInt(4, Integer.parseInt(userType));
-                    preparedStatement.setDouble(5, Double.parseDouble(withdrawMoney));
-                    preparedStatement.executeUpdate();
-
-                    session.setAttribute("pageId", "admin");
-                    session.setAttribute("message", "用户创建成功！");
+                    //重定向至成功页面
                     response.sendRedirect("/Success.jsp");
                     return;
-                }catch (SQLException sqle){
-                    sqle.printStackTrace();
                 }
+                case "withdraw": {
+                    double withdrawBLA;
+                    String tradeDate;
+                    String userName = request.getParameter("userName");
+                    long serialNum = System.currentTimeMillis();
 
+                    withdrawBLA = Double.parseDouble(request.getParameter("withdrawBla"));
+                    tradeDate = request.getParameter("tradeDate");
+
+                    //查询账户是否存在，不存在重定向至错误页
+                    try {
+                        String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
+
+                        if (!resultSet.next()) {
+                            session.setAttribute("message", "账户不存在！");
+                            session.setAttribute("pageId", "admin");
+                            response.sendRedirect("/Failed.jsp");
+                            return;
+                        }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //查询账户类型，定期存款不能存取
+                    try {
+                        String SQL0 = "select ATYPE from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL0);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
+
+                        while (resultSet.next()) {
+                            int accountType = resultSet.getInt("ATYPE");
+                            if (accountType != 1) {
+                                session.setAttribute("message", "账户类型不支持此业务！");
+                                session.setAttribute("pageId", "admin");
+                                response.sendRedirect("/Failed.jsp");
+                                return;
+                            }
+                        }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //查询余额，保证存款可以顺利进行
+                    try {
+                        String SQL1 = "select BLA from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
+
+                        while (resultSet.next()) {
+                            double curBLA = resultSet.getDouble("BLA");
+                            System.out.println(curBLA);
+                            if (withdrawBLA > curBLA) {
+                                session.setAttribute("message", "取款金额大于账户余额！");
+                                session.setAttribute("pageId", "admin");
+                                response.sendRedirect("/Failed.jsp");
+                                return;
+                            } else if (curBLA == 0) {
+                                session.setAttribute("message", "账户中余额为0！");
+                                session.setAttribute("pageId", "admin");
+                                response.sendRedirect("/Failed.jsp");
+                                return;
+                            }
+                        }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //更新账户，扣除取款数目
+                    try {
+                        String SQL2 = "update BankDB.dbo.Accounts set BLA = BLA - ? where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL2);
+                        preparedStatement.setDouble(1, withdrawBLA);
+                        preparedStatement.setInt(2, Integer.parseInt(userName));
+                        preparedStatement.executeUpdate();
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //添加交易记录
+                    try {
+                        String SQL3 = "insert into BankDB.dbo.Trades (snum, id, time, ttype, sum, sour)" +
+                                "values (?,?,?,?,?,?)";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL3);
+                        preparedStatement.setLong(1, serialNum);
+                        preparedStatement.setInt(2, Integer.parseInt(userName));
+                        preparedStatement.setString(3, tradeDate);
+                        preparedStatement.setInt(4, 2);
+                        preparedStatement.setDouble(5, withdrawBLA);
+                        preparedStatement.setInt(6, 1);
+                        preparedStatement.executeUpdate();
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //重定向至成功页面
+                    response.sendRedirect("/Success.jsp");
+                    return;
+                }
+                case "querybalance": {
+                    double balance = -1;
+                    String userName = request.getParameter("userName");
+
+                    //查询账户是否存在，不存在重定向至错误页
+                    try {
+                        String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
+
+                        if (!resultSet.next()) {
+                            session.setAttribute("message", "账户不存在！");
+                            session.setAttribute("pageId", "admin");
+                            response.sendRedirect("/Failed.jsp");
+                            return;
+                        }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //查询余额
+                    try {
+                        String SQL1 = "select BLA from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
+
+                        while (resultSet.next()) {
+                            balance = resultSet.getDouble("BLA");
+                        }
+                        session.setAttribute("userBla", balance);
+                        session.setAttribute("pageId", "admin");
+                        response.sendRedirect("/Result.jsp");
+                        return;
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+                    break;
+                }
+                case "querytrade": {
+                    String startDate = request.getParameter("startDate");
+                    String endDate = request.getParameter("endDate");
+                    String userName = request.getParameter("userName");
+
+                    //查询账户是否存在，不存在重定向至错误页
+                    try {
+                        String SQL = "select PWD from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
+
+                        if (!resultSet.next()) {
+                            session.setAttribute("message", "账户不存在！");
+                            session.setAttribute("pageId", "admin");
+                            response.sendRedirect("/Failed.jsp");
+                            return;
+                        }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //查询存入交易
+                    try {
+                        String SQL1 = "select SNUM, ID, TIME, TTYPE, SOUR, SUM from BankDB.dbo.Trades where ID = ? and TIME >= ? and TIME <= ? and TTYPE = 1 order by TIME;";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL1);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        preparedStatement.setString(2, startDate);
+                        preparedStatement.setString(3, endDate);
+                        resultSet = preparedStatement.executeQuery();
+
+                        //resultSet.last();
+                        int cnt;//= resultSet.getRow();
+                        TradeResult[] saveResult = new TradeResult[200];
+                        for (int i = 0; i < 200; i++) {
+                            saveResult[i] = new TradeResult();
+                            saveResult[i].sum = 0;
+                            saveResult[i].tradeSource = 0;
+                            saveResult[i].tradeDate = " ";
+                            saveResult[i].tradeType = 0;
+                            saveResult[i].serialNum = 0;
+                            saveResult[i].userID = 0;
+                        }
+                        //resultSet.first();
+                        cnt = 0;
+                        double totalIncome = 0;
+
+                        long snum;
+                        double s;
+                        int id;
+                        int tt;
+                        String t;
+                        int sour;
+
+                        while (resultSet.next()) {
+                            snum = resultSet.getLong("SNUM");
+                            s = resultSet.getDouble("SUM");
+                            id = resultSet.getInt("ID");
+                            tt = resultSet.getInt("TTYPE");
+                            t = resultSet.getString("TIME");
+                            sour = resultSet.getInt("SOUR");
+                            System.out.println(snum + " " + s + " " + id + " " + tt + " " + t + " " + sour);
+
+                            saveResult[cnt].serialNum = snum;
+                            saveResult[cnt].sum = s;
+                            saveResult[cnt].userID = id;
+                            saveResult[cnt].tradeType = tt;
+                            saveResult[cnt].tradeDate = t;
+                            saveResult[cnt].tradeSource = sour;
+                            totalIncome += s;
+                            cnt++;
+                        }
+
+                        session.setAttribute("saveResult", saveResult);
+                        session.setAttribute("totalIncome", totalIncome);
+                        session.setAttribute("saveItemNum", cnt);
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //查询取款
+                    try {
+                        String SQL2 = "select * from BankDB.dbo.Trades where ID = ? and TIME >= ? and TIME <= ? and TTYPE = 2 order by TIME;";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL2);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        preparedStatement.setString(2, startDate);
+                        preparedStatement.setString(3, endDate);
+                        resultSet = preparedStatement.executeQuery();
+
+                        //resultSet.last();
+                        int cnt;//= resultSet.getRow();
+                        TradeResult[] withdrawResult = new TradeResult[200];
+                        //resultSet.first();
+                        cnt = 0;
+                        double totalExpenditure = 0;
+                        for (int i = 0; i < 200; i++) {
+                            withdrawResult[i] = new TradeResult();
+                            withdrawResult[i].sum = 0;
+                            withdrawResult[i].tradeSource = 0;
+                            withdrawResult[i].tradeDate = " ";
+                            withdrawResult[i].tradeType = 0;
+                            withdrawResult[i].serialNum = 0;
+                            withdrawResult[i].userID = 0;
+                        }
+
+                        while (resultSet.next()) {
+                            withdrawResult[cnt].setSerialNum(resultSet.getLong("SNUM"));
+                            withdrawResult[cnt].setSum(resultSet.getDouble("SUM"));
+                            withdrawResult[cnt].setUserID(resultSet.getInt("ID"));
+                            withdrawResult[cnt].setTradeType(resultSet.getInt("TTYPE"));
+                            withdrawResult[cnt].setTradeDate(resultSet.getString("TIME"));
+                            withdrawResult[cnt].setTradeSource(resultSet.getInt("SOUR"));
+                            totalExpenditure += withdrawResult[cnt].getSum();
+                            cnt++;
+                        }
+
+                        session.setAttribute("withdrawResult", withdrawResult);
+                        session.setAttribute("totalExpenditure", totalExpenditure);
+                        session.setAttribute("withdrawItemNum", cnt);
+
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //重定向至结果页面
+                    session.setAttribute("pageId", "admin");
+                    response.sendRedirect("/TradeResult.jsp");
+                    return;
+                }
+                case "createuser": {
+                    String userName = request.getParameter("userName");
+                    String userPWD = request.getParameter("userPWD");
+                    String userType = request.getParameter("userType");
+                    String accountName = request.getParameter("name");
+                    String withdrawMoney = request.getParameter("withdrawMoney");
+
+                    //查询账户是否存在，若已存在重定向至错误页
+                    try {
+                        String SQL = "select ID from BankDB.dbo.Accounts where ID = ?";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        resultSet = preparedStatement.executeQuery();
+
+                        if (resultSet.next()) {
+                            session.setAttribute("pageId", "admin");
+                            session.setAttribute("message", "账户已存在，请勿重复创建！");
+                            response.sendRedirect("/Failed.jsp");
+                            return;
+                        }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    //创建用户
+                    try {
+                        String SQL = "insert into BankDB.dbo.Accounts (ID, NAME, PWD, ATYPE, BLA) values (?, ?, ?, ?, ?);";
+                        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
+                        preparedStatement.setInt(1, Integer.parseInt(userName));
+                        preparedStatement.setString(2, accountName);
+                        preparedStatement.setInt(3, Integer.parseInt(userPWD));
+                        preparedStatement.setInt(4, Integer.parseInt(userType));
+                        preparedStatement.setDouble(5, Double.parseDouble(withdrawMoney));
+                        preparedStatement.executeUpdate();
+
+                        session.setAttribute("pageId", "admin");
+                        session.setAttribute("message", "用户创建成功！");
+                        response.sendRedirect("/Success.jsp");
+                        return;
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
+
+                    break;
+                }
             }
 
         }catch (Exception e){
