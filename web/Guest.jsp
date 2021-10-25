@@ -79,7 +79,7 @@
         <div style="width: 500px;height: 40px;">
             <p style="margin-left: 100px;">输入信息：</p>
             <hr>
-            <form action="${pageContext.request.contextPath}/Guest" method="post" style="margin-left: 100px;">
+            <form action="${pageContext.request.contextPath}/Guest" method="post" style="margin-left: 100px;" onsubmit="return checkSave(this);">
                 <label>
                     <input type="text" hidden name="tradeType" value="save">
                 </label>
@@ -99,7 +99,7 @@
         <div style="width: 500px;height: 40px;">
             <p style="margin-left: 100px;">输入信息：</p>
             <hr>
-            <form action="${pageContext.request.contextPath}/Guest" method="post" style="margin-left: 100px;">
+            <form action="${pageContext.request.contextPath}/Guest" method="post" style="margin-left: 100px;" onsubmit="return checkWithdraw(this);">
                 <label>
                     <input type="text" hidden name="tradeType" value="withdraw">
                 </label>
@@ -134,7 +134,7 @@
         <div style="width: 500px;height: 40px;">
             <p style="margin-left: 100px;">输入信息：</p>
             <hr>
-            <form action="${pageContext.request.contextPath}/Guest" method="post" style="margin-left: 100px;">
+            <form action="${pageContext.request.contextPath}/Guest" method="post" style="margin-left: 100px;" onsubmit="return checkQueryTrade(this);">
                 <label>
                     <input type="text" hidden name="tradeType" value="querytrade">
                 </label>
@@ -208,6 +208,84 @@
             }
         }
     }
+
+    function checkSave(form){
+        let re = /^[+-]?(0|([1-9]\d*))(\.\d+)?$/;
+        let DateRe = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        if(form.saveBla.value === ""){
+            alert("存款金额不能为空！");
+            form.saveBla.focus();
+            return false;
+        } else if(form.saveBla.value <= 0.0){
+            alert("存款金额不能小于或等于0！");
+            form.saveBla.focus();
+            return false;
+        } else if(form.tradeDate.value === ""){
+            alert("存款日期不能为空！");
+            form.tradeDate.focus();
+            return false;
+        } else if(!re.test(form.saveBla.value)){
+            alert("请在金额处输入数字！");
+            form.saveBla.focus();
+            return false;
+        }else if(!DateRe.test(form.tradeDate.value)){
+            alert("存款日期格式错误！");
+            form.tradeDate.focus();
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    function checkWithdraw(form){
+        let re = /^[+-]?(0|([1-9]\d*))(\.\d+)?$/;
+        let DateRe = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        if(form.withdrawBla.value === ""){
+            alert("取款金额不能为空！");
+            form.withdrawBla.focus();
+            return false;
+        }else if(form.withdrawBla.value <= 0.0){
+            alert("取款金额不能小于或等于0！");
+            form.withdrawBla.focus();
+            return false;
+        }else if(form.tradeDate.value === ""){
+            alert("取款日期不能为空！");
+            form.tradeDate.focus();
+            return false;
+        }else if(!re.test(form.withdrawBla.value)){
+            alert("请在金额处输入数字！");
+            form.withdrawBla.focus();
+            return false;
+        }else if(!DateRe.test(form.tradeDate.value)){
+            alert("取款日期格式错误！");
+            form.tradeDate.focus();
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    function checkQueryTrade(form){
+        let DateRe = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        if(form.startDate.value === ""){
+            alert("起始日期不能为空！");
+            form.startDate.focus();
+            return false;
+        }else if(form.endDate.value === ""){
+            alert("终止日期不能为空！");
+            form.endDate.focus();
+            return false;
+        }else if(!DateRe.test(form.startDate.value) || !DateRe.test(form.endDate.value)){
+            alert("日期格式不正确！");
+            return false;
+        }else {
+            return true;
+        }
+    }
+
     function logOut(){
         window.location.href = "/BankHome.jsp";
     }
