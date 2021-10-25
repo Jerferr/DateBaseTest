@@ -304,7 +304,6 @@ public class BusinessServlet extends HttpServlet{
                     //重定向至结果页面
                     session.setAttribute("pageId", "guest");
                     response.sendRedirect("/TradeResult.jsp");
-                    return;
             }
         }catch (Exception e){
             e.printStackTrace();
