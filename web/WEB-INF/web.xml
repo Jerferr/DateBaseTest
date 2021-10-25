@@ -34,4 +34,14 @@
         <url-pattern>/Guest</url-pattern>
     </servlet-mapping>
 
+<!-- ManageServlet-->
+    <servlet>
+        <servlet-name>ManageServlet</servlet-name>
+        <servlet-class>com.Test.ManageServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ManageServlet</servlet-name>
+        <url-pattern>/Manage</url-pattern>
+    </servlet-mapping>
+
 </web-app>

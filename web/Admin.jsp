@@ -125,6 +125,9 @@
             取款日期:<label>
             <input name="tradeDate" type="text">
         </label><br>
+            取款账户:<label>
+            <input name="userName" type="text">
+        </label><br>
             <input type="submit" value="确认">
         </form>
         <input type="button" onclick="cancelButton()" value="取消" style="margin-left: 100px;">
@@ -139,6 +142,9 @@
             <label>
                 <input type="text" hidden name="tradeType" value="querybalance">
             </label>
+            查询账户:<label>
+            <input name="userName" type="text">
+        </label><br>
             是否查询？<br>
             <input type="submit" value="确认">
         </form>
@@ -154,11 +160,38 @@
             <label>
                 <input type="text" hidden name="tradeType" value="querytrade">
             </label>
+            存款账户:<label>
+            <input name="userName" type="text">
+        </label><br>
             起始日期:<label>
             <input name="startDate" type="text">
         </label><br>
             终止日期:<label>
             <input name="endDate" type="text">
+        </label><br>
+            <input type="submit" value="确认">
+        </form>
+        <input type="button" onclick="cancelButton()" value="取消" style="margin-left: 100px;">
+    </div>
+</div>
+
+<div id="createuser" style="">
+    <div style="width: 500px;height: 40px;">
+        <p style="margin-left: 100px;">输入信息：</p>
+        <hr>
+        <form action="${pageContext.request.contextPath}/Guest" method="post" style="margin-left: 100px;">
+            <label>
+                <input type="text" hidden name="tradeType" value="querytrade">
+            </label>
+            账&nbsp;&nbsp;户:<label>
+            <input name="userName" type="text">
+        </label><br>
+            密&nbsp;&nbsp;码:<label>
+            <input name="userPWD" type="text">
+        </label><br>
+            账户类型:<br><label>
+            <input name="userType" type="radio" value="2">活期存款<br>
+            <input name="userType" type="radio" value="1">定期存款<br>
         </label><br>
             <input type="submit" value="确认">
         </form>
@@ -192,7 +225,9 @@
                     document.getElementById("all_light").style.display = "block";
                     document.getElementById("querytrade").style.display = "block";
                     return;
-                }else {
+                }else if(testObj[i].value === "createuser"){
+                    document.getElementById("createuser").style.display = "block";
+                    document.getElementById("all_light").style.display = "block";
                     return;
                 }
             }
@@ -217,6 +252,10 @@
                 }else if(testObj[i].value === "querytrade"){
                     document.getElementById("all_light").style.display = "none";
                     document.getElementById("querytrade").style.display = "none";
+                    return;
+                }else if(testObj[i].value === "createuser"){
+                    document.getElementById("createuser").style.display = "none";
+                    document.getElementById("all_light").style.display = "none";
                     return;
                 }else {
                     return;
