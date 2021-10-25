@@ -92,7 +92,7 @@
     <div style="width: 500px;height: 40px;">
         <p style="margin-left: 100px;">输入信息：</p>
         <hr>
-        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;">
+        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;" onsubmit="return checkSave(this);">
             <label>
                 <input type="text" hidden name="tradeType" value="save">
             </label>
@@ -115,7 +115,7 @@
     <div style="width: 500px;height: 40px;">
         <p style="margin-left: 100px;">输入信息：</p>
         <hr>
-        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;">
+        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;" onsubmit="return checkWithdraw(this);">
             <label>
                 <input type="text" hidden name="tradeType" value="withdraw">
             </label>
@@ -138,7 +138,7 @@
     <div style="width: 500px;height: 40px;">
         <p style="margin-left: 100px;">输入信息：</p>
         <hr>
-        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;">
+        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;" onsubmit="return checkQueryBalance(this);">
             <label>
                 <input type="text" hidden name="tradeType" value="querybalance">
             </label>
@@ -156,7 +156,7 @@
     <div style="width: 500px;height: 40px;">
         <p style="margin-left: 100px;">输入信息：</p>
         <hr>
-        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;">
+        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;" onsubmit="return checkQueryTrade(this);">
             <label>
                 <input type="text" hidden name="tradeType" value="querytrade">
             </label>
@@ -179,7 +179,7 @@
     <div style="width: 500px;height: 40px;">
         <p style="margin-left: 100px;">输入信息：</p>
         <hr>
-        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;">
+        <form action="${pageContext.request.contextPath}/Manage" method="post" style="margin-left: 100px;" onsubmit="return checkCreateUser(this);">
             <label>
                 <input type="text" hidden name="tradeType" value="createuser">
             </label>
@@ -193,8 +193,8 @@
             <input name="name" type="text">
         </label><br>
             账户类型:<br><label>
-            <input name="userType" type="radio" value="2">活期存款<br>
-            <input name="userType" type="radio" value="1">定期存款<br>
+            <input name="userType" type="radio" value="1">活期存款<br>
+            <input name="userType" type="radio" value="2">定期存款<br>
         </label><br>
             存入金额:<br><label>
             <input name="withdrawMoney" type="text">
@@ -269,6 +269,168 @@
             }
         }
     }
+
+    function checkSave(form){
+        let re = /^[+-]?(0|([1-9]\d*))(\.\d+)?$/;
+        let DateRe = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        if(form.userName.value === ""){
+            alert("账户名不能为空！");
+            form.userName.focus();
+            return false;
+        } else if(!re.test(form.userName.value)){
+            alert("账户名不为数字！");
+            form.userName.focus();
+            return false;
+        } else if(form.saveBla.value === ""){
+            alert("存款金额不能为空！");
+            form.saveBla.focus();
+            return false;
+        } else if(form.saveBla.value <= 0.0){
+            alert("存款金额不能小于或等于0！");
+            form.saveBla.focus();
+            return false;
+        } else if(form.tradeDate.value === ""){
+            alert("存款日期不能为空！");
+            form.tradeDate.focus();
+            return false;
+        } else if(!re.test(form.saveBla.value)){
+            alert("请在金额处输入数字！");
+            form.saveBla.focus();
+            return false;
+        }else if(!DateRe.test(form.tradeDate.value)){
+            alert("存款日期格式错误！");
+            form.tradeDate.focus();
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    function checkWithdraw(form){
+        let re = /^[+-]?(0|([1-9]\d*))(\.\d+)?$/;
+        let DateRe = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        if(form.userName.value === ""){
+            alert("账户名不能为空！");
+            form.userName.focus();
+            return false;
+        } else if(!re.test(form.userName.value)){
+            alert("账户名不为数字！");
+            form.userName.focus();
+            return false;
+        } else if(form.withdrawBla.value === ""){
+            alert("取款金额不能为空！");
+            form.withdrawBla.focus();
+            return false;
+        }else if(form.withdrawBla.value <= 0.0){
+            alert("取款金额不能小于或等于0！");
+            form.withdrawBla.focus();
+            return false;
+        }else if(form.tradeDate.value === ""){
+            alert("取款日期不能为空！");
+            form.tradeDate.focus();
+            return false;
+        }else if(!re.test(form.withdrawBla.value)){
+            alert("请在金额处输入数字！");
+            form.withdrawBla.focus();
+            return false;
+        }else if(!DateRe.test(form.tradeDate.value)){
+            alert("取款日期格式错误！");
+            form.tradeDate.focus();
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    function checkQueryBalance(form){
+        let re = /^[+-]?(0|([1-9]\d*))(\.\d+)?$/;
+
+        if(form.userName.value === ""){
+            alert("账户名不能为空！");
+            form.userName.focus();
+            return false;
+        }else if(!re.test(form.userName.value)){
+            alert("账户名不为数字！");
+            form.userName.focus();
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    function checkQueryTrade(form){
+        let re = /^[+-]?(0|([1-9]\d*))(\.\d+)?$/;
+        let DateRe = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
+
+        if(form.userName.value === ""){
+            alert("账户名不能为空！");
+            form.userName.focus();
+            return false;
+        }else if(!re.test(form.userName.value)){
+            alert("账户名不为数字！");
+            form.userName.focus();
+            return false;
+        }else if(form.startDate.value === ""){
+            alert("起始日期不能为空！");
+            form.startDate.focus();
+            return false;
+        }else if(form.endDate.value === ""){
+            alert("终止日期不能为空！");
+            form.endDate.focus();
+            return false;
+        }else if(!DateRe.test(form.startDate.value) || !DateRe.test(form.endDate.value)){
+            alert("日期格式不正确！");
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    function checkCreateUser(form){
+        let re = /^[+-]?(0|([1-9]\d*))(\.\d+)?$/;
+        let pwdRe = /^\d{6}$/;
+
+        if(form.userName.value === ""){
+            alert("账户名不能为空！");
+            form.userName.focus();
+            return false;
+        }else if(!re.test(form.userName.value)){
+            alert("账户名不为数字！");
+            form.userName.focus();
+            return false;
+        }else if(!pwdRe.test(form.userPWD.value)){
+            alert("用户密码不为6位数字！");
+            form.userPWD.focus();
+            return false;
+        }else if(form.userType.value === ""){
+            alert("请选择账户类型！");
+            return false;
+        }else if(form.name.value === ""){
+            alert("请填写开户姓名！");
+            return false;
+        }else if(form.withdrawMoney.value === ""){
+            alert("请填写存入金额！");
+            form.withdrawMoney.focus();
+            return false;
+        }else if(!re.test(form.withdrawMoney.value)){
+            alert("存入金额不为数字！");
+            form.withdrawMoney.focus();
+            return false;
+        }else if(form.withdrawMoney.value < 0){
+            alert("存入金额小于0！");
+            form.withdrawMoney.focus();
+            return false;
+        }else if(form.userType.value === "2" && parseFloat(form.withdrawMoney.value) === 0){
+            alert("定期账户存入金额不能为0！");
+            form.withdrawMoney.focus();
+            return false;
+        }else {
+            return true;
+        }
+    }
+
     function logOut(){
         window.location.href = "/BankHome.jsp";
     }
