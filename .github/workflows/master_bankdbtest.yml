@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: java-app
-          path: '${{ github.workspace }}/target/*.war'
+          path: '${{ github.workspace }}/out/artifacts/demo_war/*.war'
 
   deploy:
     runs-on: windows-latest
@@ -49,5 +49,5 @@ jobs:
         with:
           app-name: 'BankDBTest'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_704BC3F94DF0429D8E96C5F49C78394A }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_86CD423C67AD484588BC909E00119B07 }}
           package: '*.war'
