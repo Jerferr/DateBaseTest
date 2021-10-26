@@ -14,6 +14,7 @@ public class ClientServlet extends HttpServlet {
     }
     static final String ConnContent = "jdbc:sqlserver://182.92.211.169:1433;databaseName=BankDB;user=U1;password=0";
     static final String DB_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws IOException{
         Connection connection;
@@ -25,10 +26,10 @@ public class ClientServlet extends HttpServlet {
         String password = request.getParameter("pwd");
         if(userType.equals("admin")){
             if(userName.equals("admin") && password.equals("admin")) {
-                response.sendRedirect("/Admin.jsp");
+                response.sendRedirect(request.getContextPath() + "/Admin.jsp");
                 return;
             }else {
-                response.sendRedirect("/TypeError.jsp");
+                response.sendRedirect(request.getContextPath() + "/TypeError.jsp");
                 return;
             }
         }
@@ -46,10 +47,10 @@ public class ClientServlet extends HttpServlet {
                 if(password.equals(Integer.toString(curPWD))){
                     HttpSession session = request.getSession(true);
                     session.setAttribute("userName", userName);
-                    response.sendRedirect("/Guest.jsp");
+                    response.sendRedirect(request.getContextPath() + "/Guest.jsp");
                     return;
                 }else {
-                    response.sendRedirect("/Error.jsp");
+                    response.sendRedirect(request.getContextPath() + "/Error.jsp");
                     return;
                 }
             }

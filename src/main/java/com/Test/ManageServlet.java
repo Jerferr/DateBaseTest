@@ -44,7 +44,7 @@ public class ManageServlet extends HttpServlet {
                         if (!resultSet.next()) {
                             session.setAttribute("message", "账户不存在！");
                             session.setAttribute("pageId", "admin");
-                            response.sendRedirect("/Failed.jsp");
+                            response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                             return;
                         }
                     } catch (SQLException sqle) {
@@ -63,7 +63,7 @@ public class ManageServlet extends HttpServlet {
                             if (accountType != 1) {
                                 session.setAttribute("message", "账户类型不支持此业务！");
                                 session.setAttribute("pageId", "admin");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             }
                         }
@@ -99,7 +99,7 @@ public class ManageServlet extends HttpServlet {
                     }
 
                     //重定向至成功页面
-                    response.sendRedirect("/Success.jsp");
+                    response.sendRedirect(request.getContextPath() + "/Success.jsp");
                     return;
                 }
                 case "withdraw": {
@@ -121,7 +121,7 @@ public class ManageServlet extends HttpServlet {
                         if (!resultSet.next()) {
                             session.setAttribute("message", "账户不存在！");
                             session.setAttribute("pageId", "admin");
-                            response.sendRedirect("/Failed.jsp");
+                            response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                             return;
                         }
                     } catch (SQLException sqle) {
@@ -140,7 +140,7 @@ public class ManageServlet extends HttpServlet {
                             if (accountType != 1) {
                                 session.setAttribute("message", "账户类型不支持此业务！");
                                 session.setAttribute("pageId", "admin");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             }
                         }
@@ -161,12 +161,12 @@ public class ManageServlet extends HttpServlet {
                             if (withdrawBLA > curBLA) {
                                 session.setAttribute("message", "取款金额大于账户余额！");
                                 session.setAttribute("pageId", "admin");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             } else if (curBLA == 0) {
                                 session.setAttribute("message", "账户中余额为0！");
                                 session.setAttribute("pageId", "admin");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             }
                         }
@@ -202,7 +202,7 @@ public class ManageServlet extends HttpServlet {
                     }
 
                     //重定向至成功页面
-                    response.sendRedirect("/Success.jsp");
+                    response.sendRedirect(request.getContextPath() + "/Success.jsp");
                     return;
                 }
                 case "querybalance": {
@@ -219,7 +219,7 @@ public class ManageServlet extends HttpServlet {
                         if (!resultSet.next()) {
                             session.setAttribute("message", "账户不存在！");
                             session.setAttribute("pageId", "admin");
-                            response.sendRedirect("/Failed.jsp");
+                            response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                             return;
                         }
                     } catch (SQLException sqle) {
@@ -238,7 +238,7 @@ public class ManageServlet extends HttpServlet {
                         }
                         session.setAttribute("userBla", balance);
                         session.setAttribute("pageId", "admin");
-                        response.sendRedirect("/Result.jsp");
+                        response.sendRedirect(request.getContextPath() + "/Result.jsp");
                         return;
                     } catch (SQLException sqle) {
                         sqle.printStackTrace();
@@ -260,7 +260,7 @@ public class ManageServlet extends HttpServlet {
                         if (!resultSet.next()) {
                             session.setAttribute("message", "账户不存在！");
                             session.setAttribute("pageId", "admin");
-                            response.sendRedirect("/Failed.jsp");
+                            response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                             return;
                         }
                     } catch (SQLException sqle) {
@@ -371,7 +371,7 @@ public class ManageServlet extends HttpServlet {
 
                     //重定向至结果页面
                     session.setAttribute("pageId", "admin");
-                    response.sendRedirect("/TradeResult.jsp");
+                    response.sendRedirect(request.getContextPath() + "/TradeResult.jsp");
                     return;
                 }
                 case "createuser": {
@@ -391,7 +391,7 @@ public class ManageServlet extends HttpServlet {
                         if (resultSet.next()) {
                             session.setAttribute("pageId", "admin");
                             session.setAttribute("message", "账户已存在，请勿重复创建！");
-                            response.sendRedirect("/Failed.jsp");
+                            response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                             return;
                         }
                     } catch (SQLException sqle) {
@@ -411,7 +411,7 @@ public class ManageServlet extends HttpServlet {
 
                         session.setAttribute("pageId", "admin");
                         session.setAttribute("message", "用户创建成功！");
-                        response.sendRedirect("/Success.jsp");
+                        response.sendRedirect(request.getContextPath() + "/Success.jsp");
                         return;
                     } catch (SQLException sqle) {
                         sqle.printStackTrace();

@@ -47,7 +47,7 @@ public class BusinessServlet extends HttpServlet{
                             if (accountType != 1) {
                                 session.setAttribute("pageId", "guest");
                                 session.setAttribute("message", "账户类型不支持此业务！");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             }
                         }
@@ -84,7 +84,7 @@ public class BusinessServlet extends HttpServlet{
 
                     //重定向至成功页面
                     session.setAttribute("pageId", "guest");
-                    response.sendRedirect("/Success.jsp");
+                    response.sendRedirect(request.getContextPath() + "/Success.jsp");
                     return;
 
                 }
@@ -108,7 +108,7 @@ public class BusinessServlet extends HttpServlet{
                             if (accountType != 1) {
                                 session.setAttribute("pageId", "guest");
                                 session.setAttribute("message", "账户类型不支持此业务！");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             }
                         }
@@ -129,12 +129,12 @@ public class BusinessServlet extends HttpServlet{
                             if (withdrawBLA > curBLA) {
                                 session.setAttribute("pageId", "guest");
                                 session.setAttribute("message", "取款金额大于账户余额！");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             } else if (curBLA == 0) {
                                 session.setAttribute("pageId", "guest");
                                 session.setAttribute("message", "账户中余额为0！");
-                                response.sendRedirect("/Failed.jsp");
+                                response.sendRedirect(request.getContextPath() + "/Failed.jsp");
                                 return;
                             }
                         }
@@ -171,7 +171,7 @@ public class BusinessServlet extends HttpServlet{
 
                     //重定向至成功页面
                     session.setAttribute("pageId", "guest");
-                    response.sendRedirect("/Success.jsp");
+                    response.sendRedirect(request.getContextPath() + "/Success.jsp");
                     return;
 
                 }
@@ -188,7 +188,7 @@ public class BusinessServlet extends HttpServlet{
                         }
                         session.setAttribute("pageId", "guest");
                         session.setAttribute("userBla", balance);
-                        response.sendRedirect("/Result.jsp");
+                        response.sendRedirect(request.getContextPath() + "/Result.jsp");
                         return;
                     } catch (SQLException sqle) {
                         sqle.printStackTrace();
@@ -303,7 +303,7 @@ public class BusinessServlet extends HttpServlet{
 
                     //重定向至结果页面
                     session.setAttribute("pageId", "guest");
-                    response.sendRedirect("/TradeResult.jsp");
+                    response.sendRedirect(request.getContextPath() + "/TradeResult.jsp");
             }
         }catch (Exception e){
             e.printStackTrace();
