@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
     <title>Success Page</title>
@@ -13,9 +13,9 @@
 <script>
     function returnPage(){
         if(<%= pageId.equals("admin")%>){
-            window.location.href = "/Admin.jsp";
+            window.location.href = "${pageContext.request.contextPath}/Admin.jsp";
         }else {
-            window.location.href = "/Guest.jsp";
+            window.location.href = "${pageContext.request.contextPath}/Guest.jsp";
         }
     }
 </script>

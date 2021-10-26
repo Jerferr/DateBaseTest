@@ -18,9 +18,9 @@
 <script>
     function returnPage(){
         if(<%= pageId.equals("admin")%>){
-            window.location.href = "/Admin.jsp";
+            window.location.href = "${pageContext.request.contextPath}/Admin.jsp";
         }else {
-            window.location.href = "/Guest.jsp";
+            window.location.href = "${pageContext.request.contextPath}/Guest.jsp";
         }
     }
 </script>

@@ -287,7 +287,7 @@
     }
 
     function logOut(){
-        window.location.href = "/BankHome.jsp";
+        window.location.href = "${pageContext.request.contextPath}/BankHome.jsp";
     }
 </script>
 </html>
